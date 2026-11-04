@@ -31,7 +31,8 @@ SECRET_KEY = 'django-insecure-#u#!#y6y*lvylynz4ddb5q+a2%ql(ebljeof)ke%o5c9ed*i*p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".app.github.dev"]
+CSRF_TRUSTED_ORIGINS = ["https://*.app.github.dev"]
 
 
 # Application definition
@@ -117,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "Europe/Paris"
 
 USE_I18N = True
 

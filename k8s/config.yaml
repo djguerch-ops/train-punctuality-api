@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trains-config
+data:
+  POSTGRES_DB: trains
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_SSLMODE: disable
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: trains-secret
+type: Opaque
+stringData:
+  POSTGRES_USER: trains_user
+  POSTGRES_PASSWORD: trains_pwd

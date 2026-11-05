@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',   # Django REST Framework
     'events',           # ton app
+    'drf_spectacular'
+    
 ]
 
 MIDDLEWARE = [
@@ -138,4 +140,13 @@ MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
+}
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Train Punctuality API",
+    "DESCRIPTION": "API d'ingestion d'événements de trains et de KPI de ponctualité.",
+    "VERSION": "1.0.0",
 }

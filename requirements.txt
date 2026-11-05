@@ -6,3 +6,4 @@ psycopg-binary==3.3.8
 python-dotenv==1.2.4
 sqlparse==0.6.1
 tzdata==2026.6
+drf-spectacular==0.30.0

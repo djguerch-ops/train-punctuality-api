@@ -4,10 +4,26 @@ from rest_framework.test import APIClient
 
 from .models import TrainEvent
 
+VALID_PAYLOAD = {
+    "train_number": "6201",
+    "station": "Paris Gare de Lyon",
+    "scheduled_at": "2026-11-05T10:00:00+01:00",
+    "delay_minutes": 25,
+    "is_cancelled": False,
+}
+
 
 @pytest.fixture
 def api_client():
     return APIClient()
+
+
+@pytest.fixture
+def auth_client(django_user_model):
+    user = django_user_model.objects.create_user(username="tester", password="pass")
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
 
 
 @pytest.fixture
@@ -30,28 +46,25 @@ def sample_events(db):
 
 
 @pytest.mark.django_db
-def test_create_event(api_client):
-    payload = {
-        "train_number": "6201",
-        "station": "Paris Gare de Lyon",
-        "scheduled_at": "2026-11-05T10:00:00+01:00",
-        "delay_minutes": 25,
-        "is_cancelled": False,
-    }
-    response = api_client.post("/api/events/", payload, format="json")
+def test_create_event(auth_client):
+    response = auth_client.post("/api/events/", VALID_PAYLOAD, format="json")
 
     assert response.status_code == 201
     assert TrainEvent.objects.count() == 1
 
 
 @pytest.mark.django_db
-def test_reject_invalid_train_number(api_client):
-    payload = {
-        "train_number": "TGV62",
-        "station": "Lyon Part-Dieu",
-        "scheduled_at": "2026-11-05T10:00:00+01:00",
-    }
-    response = api_client.post("/api/events/", payload, format="json")
+def test_create_event_without_token_is_rejected(api_client):
+    response = api_client.post("/api/events/", VALID_PAYLOAD, format="json")
+
+    assert response.status_code == 401
+    assert TrainEvent.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_reject_invalid_train_number(auth_client):
+    payload = {**VALID_PAYLOAD, "train_number": "TGV62"}
+    response = auth_client.post("/api/events/", payload, format="json")
 
     assert response.status_code == 400
     assert "train_number" in response.data

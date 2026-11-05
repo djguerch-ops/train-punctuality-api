@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: trains
+          POSTGRES_USER: trains_user
+          POSTGRES_PASSWORD: trains_pwd
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U trains_user -d trains"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      POSTGRES_DB: trains
+      POSTGRES_USER: trains_user
+      POSTGRES_PASSWORD: trains_pwd
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_SSLMODE: disable
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: pytest -v
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t train-punctuality-api:${{ github.sha }} .
